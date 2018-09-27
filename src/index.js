@@ -19,13 +19,4 @@ const NextREST = function nextRESTMiddlewareFactory () {
   return middleware
 }
 
-/******
-
-Functions:
-
-  findType (types, url)
-    finds the addressed type based on the request url
-
-******/
-
 module.exports = NextREST
