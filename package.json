@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "NextREST's express js server implementation",
   "main": "src/index.js",
+  "engines": {
+    "node": ">= 8.3.0"
+  },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
