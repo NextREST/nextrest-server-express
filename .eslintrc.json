@@ -6,7 +6,10 @@
   "rules": {
     "semi": [ "error", "never" ],
     "object-curly-spacing": [ "error", "always" ],
-    "array-bracket-spacing": [ "error", "always" ]
+    "array-bracket-spacing": [ "error", "always" ],
+    "no-unused-vars": [ "error", {
+      "ignoreRestSiblings": true
+    } ]
   },
   "overrides": [
     {
