@@ -11,6 +11,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./setupTestFramework.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NextREST/nextrest-server-express.git"

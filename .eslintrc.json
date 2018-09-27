@@ -14,7 +14,8 @@
   "overrides": [
     {
       "files": [
-        "**/*.test.js"
+        "**/*.test.js",
+        "setupTestFramework.js"
       ],
       "env": {
         "jest": true
