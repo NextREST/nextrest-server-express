@@ -1,11 +1,21 @@
 const { registerType } = require('./registerType')
 const { findType } = require('./findType')
+const { handleRequest } = require('./handleRequest')
 
-const NextREST = function nextRESTMiddlewareFactory () {
+const NextREST = function nextRESTMiddlewareFactory (buildContext) {
   let types = {}
 
-  const middleware = function (req, res, next) {
-    const type = findType(types, req.path)
+  const middleware = async function (req, res, next) {
+    const endpoint = findType(types, req.path)
+    if (endpoint === false) {
+      return res.sendStatus(404)
+    }
+
+    const context = typeof buildContext === 'function'
+      ? await buildContext(req)
+      : buildContext
+
+    const result = await handleRequest(req.method, endpoint, context)
   }
 
   middleware.registerType = function registerTypeToNextREST (type) {
