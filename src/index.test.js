@@ -26,9 +26,9 @@ describe('NextREST()', () => {
     findTypeStub.restore()
   })
 
-  it('calls findType with its types and the request url', () => {
+  it('calls findType with its types and the request path', () => {
     const req = {
-      url: casual.url
+      path: casual.url
     }
 
     nextREST(req)
@@ -38,7 +38,7 @@ describe('NextREST()', () => {
     const { args } = findTypeStub.getCall(0)
     expect(args).toHaveProperty('length', 2)
     expect(args[0]).toBe(nextREST.getRegisteredTypes())
-    expect(args[1]).toBe(req.url)
+    expect(args[1]).toBe(req.path)
   })
 
   it('exposes registerType and internally uses the registerType function', () => {

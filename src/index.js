@@ -5,7 +5,7 @@ const NextREST = function nextRESTMiddlewareFactory () {
   let types = {}
 
   const middleware = function (req, res, next) {
-    const type = findType(types, req.url)
+    const type = findType(types, req.path)
   }
 
   middleware.registerType = function registerTypeToNextREST (type) {
