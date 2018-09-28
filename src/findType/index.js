@@ -44,6 +44,4 @@ const findType = function findTypeByPath (types, url) {
   }
 }
 
-module.exports = {
-  findType
-}
+module.exports = findType

@@ -1,7 +1,6 @@
 const casual = require('casual')
-const sinon = require('sinon')
 
-const { handleRequest } = require('./index.js')
+const handleRequest = require('./index.js')
 
 function makeRequestMappingTest ({
   method,
@@ -10,11 +9,11 @@ function makeRequestMappingTest ({
   responseStatus = 200
 }) {
   describe(method, () => {
-    const stub = sinon.stub()
+    const requestHandler = jest.fn()
     const type = {
       id,
       type: {
-        [functionName]: stub
+        [functionName]: requestHandler
       },
       referrer: {
         id: casual.uuid,
@@ -27,8 +26,8 @@ function makeRequestMappingTest ({
     }
 
     beforeEach(() => {
-      stub.reset()
-      stub.resolves({
+      requestHandler.mockReset()
+      requestHandler.mockResolvedValue({
         name: casual.full_name
       })
     })
@@ -36,14 +35,14 @@ function makeRequestMappingTest ({
     it(`maps to type.${functionName}`, async () => {
       await handleRequest(method, type)
 
-      expect(stub).toHaveProperty('calledOnce', true)
+      expect(requestHandler).toHaveBeenCalledTimes(1)
     })
 
     if (id !== null) {
       it(`passes the entity id as the first parameter to type.${functionName}`, async () => {
         await handleRequest(method, type)
 
-        expect(stub.getCall(0).args[0]).toBe(id)
+        expect(requestHandler.mock.calls[0][0]).toBe(id)
       })
     }
 
@@ -52,7 +51,7 @@ function makeRequestMappingTest ({
 
       await handleRequest(method, type, context)
 
-      expect(stub.getCall(0).args[argIndex]).toEqual({
+      expect(requestHandler.mock.calls[0][argIndex]).toEqual({
         referrer: type.referrer,
         context
       })
@@ -61,7 +60,7 @@ function makeRequestMappingTest ({
     it(`returns an object containing the status ${responseStatus} and the value type.${functionName} resolves to as the body`, async () => {
       const result = await handleRequest(method, type)
 
-      const returnValue = await stub.getCall(0).returnValue
+      const returnValue = await requestHandler.mock.results[0].value
       expect(result).toEqual({
         status: responseStatus,
         body: returnValue

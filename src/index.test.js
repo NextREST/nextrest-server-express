@@ -1,47 +1,40 @@
-const sinon = require('sinon')
 const casual = require('casual')
 
+jest.mock('./findType')
+jest.mock('./registerType')
+jest.mock('./handleRequest')
+
+const NextREST = require('./index.js')
+
+const findType = require('./findType')
+const registerType = require('./registerType')
+const handleRequest = require('./handleRequest')
+
 describe('NextREST()', () => {
-  const findTypeStub = sinon.stub(
-    require('./findType'),
-    'findType'
-  )
-
-  const registerTypeStub = sinon.stub(
-    require('./registerType'),
-    'registerType'
-  )
-
-  const handleRequestStub = sinon.stub(
-    require('./handleRequest'),
-    'handleRequest'
-  )
-
-  const NextREST = require('./index.js')
   let nextREST
 
   beforeEach(() => {
     nextREST = NextREST()
 
-    findTypeStub.reset()
-    findTypeStub.returns({
+    findType.mockReset()
+    findType.mockReturnValue({
       id: null,
       type: {},
       referrer: null
     })
 
-    registerTypeStub.reset()
-    registerTypeStub.returns({
+    registerType.mockReset()
+    registerType.mockReturnValue({
       [casual.word]: 'some type'
     })
 
-    handleRequestStub.reset()
+    handleRequest.mockReset()
   })
 
   afterAll(() => {
-    findTypeStub.restore()
-    registerTypeStub.restore()
-    handleRequestStub.restore()
+    findType.mockRestore()
+    registerType.mockRestore()
+    handleRequest.mockRestore()
   })
 
   it('calls findType() with its types and the request path', () => {
@@ -51,12 +44,14 @@ describe('NextREST()', () => {
 
     nextREST(req)
 
-    expect(findTypeStub).toHaveProperty('calledOnce', true)
-
-    const { args } = findTypeStub.getCall(0)
-    expect(args).toHaveProperty('length', 2)
-    expect(args[0]).toBe(nextREST.getRegisteredTypes())
-    expect(args[1]).toBe(req.path)
+    expect(findType).toHaveBeenCalledTimes(1)
+    expect(findType).toHaveBeenCalledWith(
+      nextREST.getRegisteredTypes(),
+      req.path
+    )
+    expect(findType.mock.calls[0][0]).toBe(
+      nextREST.getRegisteredTypes()
+    ) // check if it's the same reference
   })
 
   it('exposes registerType() and internally uses the registerType function', () => {
@@ -67,9 +62,10 @@ describe('NextREST()', () => {
     const typesBefore = nextREST.getRegisteredTypes()
     nextREST.registerType(type)
 
-    expect(registerTypeStub).toHaveProperty('calledOnce', true)
+    expect(registerType).toHaveBeenCalledTimes(1)
 
-    const { args, returnValue } = registerTypeStub.getCall(0)
+    const { value: returnValue } = registerType.mock.results[0]
+    const args = registerType.mock.calls[0]
 
     expect(nextREST.getRegisteredTypes()).toBe(returnValue)
 
@@ -86,9 +82,9 @@ describe('NextREST()', () => {
 
       await nextREST(req)
 
-      expect(handleRequestStub).toHaveProperty('calledOnce', true)
+      expect(handleRequest).toHaveBeenCalledTimes(1)
 
-      const { args } = handleRequestStub.getCall(0)
+      const args = handleRequest.mock.calls[0]
       expect(args).toHaveProperty('length', 3)
       expect(args[0]).toBe(req.method)
     })
@@ -96,34 +92,32 @@ describe('NextREST()', () => {
     it('gets passed the result of findType() as the second argument', async () => {
       await nextREST({})
 
-      expect(handleRequestStub).toHaveProperty('calledOnce', true)
-      expect(findTypeStub).toHaveProperty('calledOnce', true)
+      expect(handleRequest).toHaveBeenCalledTimes(1)
+      expect(findType).toHaveBeenCalledTimes(1)
 
-      const { args } = handleRequestStub.getCall(0)
+      const args = handleRequest.mock.calls[0]
       expect(args).toHaveProperty('length', 3)
-      expect(args[1]).toBe(findTypeStub.getCall(0).returnValue)
+      expect(args[1]).toBe(findType.mock.results[0].value)
     })
 
     it('gets passed the resolved value of the users buildContext() as the third argument', async () => {
       const req = {}
-      const buildContext = sinon.stub()
-        .resolves(casual.username)
+      const buildContext = jest.fn()
+        .mockResolvedValue(casual.username)
 
       nextREST = NextREST(buildContext)
       await nextREST(req)
 
-      expect(buildContext).toHaveProperty('calledOnce', true)
-      const {
-        args: buildContextArgs,
-        returnValue: context
-      } = buildContext.getCall(0)
+      expect(buildContext).toHaveBeenCalledTimes(1)
+      const  buildContextArgs = buildContext.mock.calls[0]
+      const { value: context } = buildContext.mock.results[0]
 
       expect(buildContextArgs).toHaveProperty('length', 1)
       expect(buildContextArgs[0]).toBe(req)
 
-      expect(handleRequestStub).toHaveProperty('calledOnce', true)
+      expect(handleRequest).toHaveBeenCalledTimes(1)
 
-      const { args } = handleRequestStub.getCall(0)
+      const args = handleRequest.mock.calls[0]
       expect(args).toHaveProperty('length', 3)
       expect(args[2]).toBe(await context)
     })

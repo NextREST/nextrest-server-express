@@ -66,6 +66,4 @@ const handleRequest = async function handleRequestForType (method, endpoint, con
   }
 }
 
-module.exports = {
-  handleRequest
-}
+module.exports = handleRequest

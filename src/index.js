@@ -1,6 +1,6 @@
-const { registerType } = require('./registerType')
-const { findType } = require('./findType')
-const { handleRequest } = require('./handleRequest')
+const registerType = require('./registerType')
+const findType = require('./findType')
+const handleRequest = require('./handleRequest')
 
 const NextREST = function nextRESTMiddlewareFactory (buildContext) {
   let types = {}

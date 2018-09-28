@@ -1,5 +1,5 @@
 const casual = require('casual')
-const { findType } = require('./index.js')
+const findType = require('./index.js')
 
 describe('findType()', () => {
   it('can find root types', () => {

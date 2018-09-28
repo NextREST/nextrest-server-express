@@ -1,6 +1,6 @@
 const casual = require('casual')
 
-const { registerType } = require('./index.js')
+const registerType = require('./index.js')
 
 describe('registerType()', () => {
   let type
