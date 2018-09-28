@@ -54,6 +54,24 @@ describe('NextREST()', () => {
     ) // check if it's the same reference
   })
 
+  it('returns with res.sendStatus(404) if findType() returns false', async () => {
+    findType.mockReturnValue(false)
+    const res = {
+      sendStatus: jest.fn()
+        .mockReturnValue({})
+    }
+
+    const result = await nextREST({}, res)
+
+    expect(findType).toHaveBeenCalledTimes(1)
+
+    expect(res.sendStatus).toHaveBeenCalledTimes(1)
+    expect(res.sendStatus).toHaveBeenCalledWith(404)
+    expect(result).toBe(res.sendStatus.mock.results[0].value)
+
+    expect(handleRequest).toHaveBeenCalledTimes(0)
+  })
+
   it('exposes registerType() and internally uses the registerType function', () => {
     const type = {
       resourceName: casual.word
