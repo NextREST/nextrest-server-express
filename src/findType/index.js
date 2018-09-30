@@ -1,3 +1,8 @@
+const reservedKeywords = [
+  'actions',
+  'fields'
+]
+
 const isEven = function (num) {
   return num % 2 === 0
 }
@@ -7,8 +12,14 @@ const findType = function findTypeByPath (types, url) {
 
   let type = types
   let referrer = null
+  let query = null
   for (let i = 0; i < path.length; i++) {
     const section = path[i]
+
+    if (reservedKeywords.includes(section)) {
+      query = path.slice(i).join('/')
+      break
+    }
 
     if (isEven(i)) {
       type = (
@@ -40,7 +51,8 @@ const findType = function findTypeByPath (types, url) {
       ? path[path.length - 1]
       : null,
     type,
-    referrer
+    referrer,
+    query
   }
 }
 

@@ -1,6 +1,28 @@
 const casual = require('casual')
 const findType = require('./index.js')
 
+function makeQueryDetectionTest({
+  testName,
+  query,
+  expectedResult = query
+}) {
+  it(testName, () => {
+    const types = {
+      [casual.word]: {
+        get: () => null
+      }
+    }
+
+    const id = casual.uuid
+    const { query: result } = findType(
+      types,
+      `/${Object.keys(types)[0]}/${id}${query}`
+    )
+
+    expect(result).toBe(expectedResult && expectedResult.slice(1))
+  })
+}
+
 describe('findType()', () => {
   it('can find root types', () => {
     const resourceName = casual.word
@@ -89,5 +111,21 @@ describe('findType()', () => {
         referrer: null
       }
     })
+  })
+
+  makeQueryDetectionTest({
+    testName: 'returns null as query if non was provided',
+    query: '',
+    expectedResult: null
+  })
+
+  makeQueryDetectionTest({
+    testName: 'returns the type sub-query string if an action was called',
+    query: '/actions/test/invoke'
+  })
+
+  makeQueryDetectionTest({
+    testName: 'returns the type sub-query string if a field was requested',
+    query: '/fields/test'
   })
 })
