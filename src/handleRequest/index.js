@@ -1,36 +1,11 @@
-const methodToFunctionMappingByRequestType = {
-  type: {
-    'GET': {
-      fnName: 'list',
-      resStatus: 200
-    },
-    'POST': {
-      fnName: 'create',
-      resStatus: 201
-    },
-    'PUT': {
-      fnName: 'replace',
-      resStatus: 200
-    }
-  },
-  entity: {
-    'GET': {
-      fnName: 'get',
-      resStatus: 200
-    },
-    'DELETE': {
-      fnName: 'delete',
-      resStatus: 200
-    },
-    'PATCH': {
-      fnName: 'edit',
-      resStatus: 200
-    }
-  }
-}
+const handleQueryRequest = require('./handleQueryRequest')
 
 const handleRequest = async function handleRequestForType (method, endpoint, context) {
-  const { type, id, referrer } = endpoint
+  const { type, id, referrer, query = null } = endpoint
+
+  if (query !== null) {
+    return handleQueryRequest(method, endpoint, context)
+  }
 
   const methodToFunctionMapping = methodToFunctionMappingByRequestType[
     id === null ? 'type' : 'entity'
@@ -63,6 +38,37 @@ const handleRequest = async function handleRequestForType (method, endpoint, con
     body: id === null
       ? await resolver(meta)
       : await resolver(id, meta)
+  }
+}
+
+const methodToFunctionMappingByRequestType = {
+  type: {
+    'GET': {
+      fnName: 'list',
+      resStatus: 200
+    },
+    'POST': {
+      fnName: 'create',
+      resStatus: 201
+    },
+    'PUT': {
+      fnName: 'replace',
+      resStatus: 200
+    }
+  },
+  entity: {
+    'GET': {
+      fnName: 'get',
+      resStatus: 200
+    },
+    'DELETE': {
+      fnName: 'delete',
+      resStatus: 200
+    },
+    'PATCH': {
+      fnName: 'edit',
+      resStatus: 200
+    }
   }
 }
 

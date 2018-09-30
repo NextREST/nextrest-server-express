@@ -1,11 +1,14 @@
 const casual = require('casual')
 
+jest.mock('./handleQueryRequest')
+
 const handleRequest = require('./index.js')
+const handleQueryRequest = require('./handleQueryRequest')
 
 function makeRequestMappingTest ({
-  method,
   functionName,
   id,
+  method,
   responseStatus = 200
 }) {
   describe(method, () => {
@@ -21,6 +24,7 @@ function makeRequestMappingTest ({
         referrer: null
       }
     }
+
     const context = {
       userId: casual.uuid
     }
@@ -70,6 +74,10 @@ function makeRequestMappingTest ({
 }
 
 describe('handleRequest()', () => {
+  beforeEach(() => {
+    handleQueryRequest.mockReset()
+  })
+
   it('returns { status: 404 } if there\'s no function to handle the request', async () => {
     const result = await handleRequest('GET', {
       id: casual.uuid,
@@ -128,5 +136,36 @@ describe('handleRequest()', () => {
       functionName: 'delete',
       id: casual.uuid
     })
+  })
+
+  it('calls handleQueryRequest() with the given endpoint and returns its result if a query is given', async () => {
+    const method = casual.http_method
+    const endpoint = {
+      query: casual.word
+    }
+    const context = {
+      userId: casual.uuid
+    }
+
+    handleQueryRequest.mockResolvedValue({
+      name: casual.username
+    })
+    const res = await handleRequest(
+      method,
+      endpoint,
+      context
+    )
+
+    expect(handleQueryRequest).toHaveBeenCalledTimes(1)
+
+    const args = handleQueryRequest.mock.calls[0]
+    expect(args).toHaveProperty('length', 3)
+    expect(args[0]).toBe(method)
+    expect(args[1]).toBe(endpoint)
+    expect(args[2]).toBe(context)
+
+    expect(res).toBe(
+      await handleQueryRequest.mock.results[0].value
+    )
   })
 })
