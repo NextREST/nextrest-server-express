@@ -103,22 +103,38 @@ describe('NextREST()', () => {
       expect(handleRequest).toHaveBeenCalledTimes(1)
 
       const args = handleRequest.mock.calls[0]
-      expect(args).toHaveProperty('length', 3)
+      expect(args).toHaveProperty('length', 4)
       expect(args[0]).toBe(req.method)
     })
 
-    it('gets passed the result of findType() as the second argument', async () => {
+    it('gets passed req.body as the second argument', async () => {
+      const req = {
+        body: {
+          name: casual.name
+        }
+      }
+
+      await nextREST(req)
+
+      expect(handleRequest).toHaveBeenCalledTimes(1)
+
+      const args = handleRequest.mock.calls[0]
+      expect(args).toHaveProperty('length', 4)
+      expect(args[1]).toBe(req.body)
+    })
+
+    it('gets passed the result of findType() as the third argument', async () => {
       await nextREST({})
 
       expect(handleRequest).toHaveBeenCalledTimes(1)
       expect(findType).toHaveBeenCalledTimes(1)
 
       const args = handleRequest.mock.calls[0]
-      expect(args).toHaveProperty('length', 3)
-      expect(args[1]).toBe(findType.mock.results[0].value)
+      expect(args).toHaveProperty('length', 4)
+      expect(args[2]).toBe(findType.mock.results[0].value)
     })
 
-    it('gets passed the resolved value of the users buildContext() as the third argument', async () => {
+    it('gets passed the resolved value of the users buildContext() as the fourth argument', async () => {
       const req = {}
       const buildContext = jest.fn()
         .mockResolvedValue(casual.username)
@@ -136,8 +152,8 @@ describe('NextREST()', () => {
       expect(handleRequest).toHaveBeenCalledTimes(1)
 
       const args = handleRequest.mock.calls[0]
-      expect(args).toHaveProperty('length', 3)
-      expect(args[2]).toBe(await context)
+      expect(args).toHaveProperty('length', 4)
+      expect(args[3]).toBe(await context)
     })
   })
 })

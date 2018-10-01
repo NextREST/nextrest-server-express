@@ -15,7 +15,7 @@ const NextREST = function nextRESTMiddlewareFactory (buildContext) {
       ? await buildContext(req)
       : buildContext
 
-    const result = await handleRequest(req.method, endpoint, context)
+    const result = await handleRequest(req.method, req.body, endpoint, context)
   }
 
   middleware.registerType = function registerTypeToNextREST (type) {

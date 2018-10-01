@@ -1,10 +1,10 @@
 const handleQueryRequest = require('./handleQueryRequest')
 
-const handleRequest = async function handleRequestForType (method, endpoint, context) {
+const handleRequest = async function handleRequestForType (method, data, endpoint, context) {
   const { type, id, referrer, query = null } = endpoint
 
   if (query !== null) {
-    return handleQueryRequest(method, endpoint, context)
+    return handleQueryRequest(method, data, endpoint, context)
   }
 
   const methodToFunctionMapping = methodToFunctionMappingByRequestType[
@@ -45,8 +45,8 @@ const handleRequest = async function handleRequestForType (method, endpoint, con
   return {
     status: resStatus,
     body: id === null
-      ? await requestHandler(meta)
-      : await requestHandler(id, meta)
+      ? await requestHandler(data, meta)
+      : await requestHandler(id, data, meta)
   }
 }
 
