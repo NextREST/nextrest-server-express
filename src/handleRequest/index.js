@@ -13,13 +13,22 @@ const handleRequest = async function handleRequestForType (method, endpoint, con
   const { fnName, resStatus } = methodToFunctionMapping[method]
   const requestHandler = type[fnName]
 
-    const typeSupportsRequestType = Object.values(methodToFunctionMapping)
-      .some(({ fnName }) => type[fnName])
   if (!requestHandler) {
+    const typeSupportsRequestType = Object.keys(methodToFunctionMapping)
+      .map((method) => ({
+        method,
+        fnName: methodToFunctionMapping[method].fnName
+      }))
+      .filter(({ fnName }) => type[fnName])
 
-    if (typeSupportsRequestType) {
+    if (typeSupportsRequestType.length > 0) {
       return {
-        status: 405
+        status: 405,
+        headers: {
+          Allow: typeSupportsRequestType
+            .map(({ method }) => method)
+            .join(', ')
+        }
       }
     }
 

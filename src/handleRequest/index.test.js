@@ -78,7 +78,7 @@ describe('handleRequest()', () => {
     handleQueryRequest.mockReset()
   })
 
-  it('returns { status: 404 } if there\'s no function to handle the request', async () => {
+  it('returns the status 404 if there\'s no function to handle the request', async () => {
     const result = await handleRequest('GET', {
       id: casual.uuid,
       type: {
@@ -91,7 +91,7 @@ describe('handleRequest()', () => {
     })
   })
 
-  it('returns { status: 405 } if there is a function for the current scope but it is not using the requested method', async () => {
+  it('returns the status 405 and an adequate Allow header if there is a function for the current scope but it is not using the requested method', async () => {
     const result = await handleRequest('GET', {
       type: {
         delete: () => null
@@ -99,7 +99,10 @@ describe('handleRequest()', () => {
     })
 
     expect(result).toEqual({
-      status: 405
+      status: 405,
+      headers: {
+        Allow: 'DELETE'
+      }
     })
   })
 
