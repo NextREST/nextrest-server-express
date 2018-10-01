@@ -11,11 +11,11 @@ const handleRequest = async function handleRequestForType (method, endpoint, con
     id === null ? 'type' : 'entity'
   ]
   const { fnName, resStatus } = methodToFunctionMapping[method]
-  const resolver = type[fnName]
+  const requestHandler = type[fnName]
 
-  if (!resolver) {
     const typeSupportsRequestType = Object.values(methodToFunctionMapping)
       .some(({ fnName }) => type[fnName])
+  if (!requestHandler) {
 
     if (typeSupportsRequestType) {
       return {
@@ -36,8 +36,8 @@ const handleRequest = async function handleRequestForType (method, endpoint, con
   return {
     status: resStatus,
     body: id === null
-      ? await resolver(meta)
-      : await resolver(id, meta)
+      ? await requestHandler(meta)
+      : await requestHandler(id, meta)
   }
 }
 
